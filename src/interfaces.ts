@@ -19,3 +19,22 @@ export interface iDestiny {
 	cityTag: string
 	country: string
 }
+
+export interface iUser {
+	id: string
+	name: string
+	password: string
+	cpf: string
+	age: number
+	adress: string
+	number: string
+	passportNumber?: string
+}
+
+export interface iCard {
+	id: string
+	cardNumber: number
+	securityNumber: number
+	validity: Date
+	propertyName: string
+}
