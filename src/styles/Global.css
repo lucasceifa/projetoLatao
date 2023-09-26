@@ -1,0 +1,22 @@
+:root{
+  --primary: #2E2E2E;
+  --secondary: #000000;
+
+  --green: #007500;
+
+  --text: #FFFFFF;
+  --black: #000000;
+  --light: #cccccc;
+  --light50: #cccccc70;
+  --label: #979797;
+  --label-dark: #515050;
+
+  --sucess: #34D399;
+  --alert: #F87171;
+
+  --blue: #120a8f;
+  --blue-dark: #190d46;
+
+	--transitionBtns: 0.2s;
+	--ShadowBtns: 0rem 0.125rem 0.5rem rgba(0, 0, 0, 0.25);
+}
