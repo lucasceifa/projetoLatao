@@ -1,0 +1,23 @@
+.overflowY {
+	overflow-y: hidden;
+	position: relative;
+}
+
+.custom-prev-arrow {
+	position: absolute;
+	top: 50%;
+	left: 20px;
+	transform: translate( 0,-50%);
+	z-index: 9;
+	color: var(--text);
+    cursor: pointer;
+  }
+  
+  .custom-next-arrow {
+	position: absolute;
+	top: 50%;
+	right: 20px;
+	transform: translate(0, -50%);
+	color: #fff;
+    cursor: pointer;
+  }

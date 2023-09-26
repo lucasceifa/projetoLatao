@@ -24,7 +24,7 @@ export const Header: React.FC = () => {
 	return (
 		<Flex fontWeight={'700'} px={'3.5%'} backgroundColor={'var(--primary)'} py={'0rem'} boxSizing={'border-box'}  color={'var(--text)'} alignItems={'center'} justifyContent={'space-between'}>
 			<Flex overflowY={'hidden'} minW={'23rem'} width={'35%'} m={'0.75rem 0'} fontWeight={'700'} fontSize={'20px'}>
-				<Img h={'5.5rem'} src={'../../public/logo.png'}/>
+				<Img h={'5.5rem'} src={'../../public/logo.png'} cursor={'pointer'} onClick={() => nav('/')}/>
 			</Flex>
 			<nav style={{ display: 'flex', minWidth: '51rem', justifyContent: 'flex-end', alignItems: 'center', gap: '2rem'}}>
 				{!pathname.includes('Login') && UserName === '' && (

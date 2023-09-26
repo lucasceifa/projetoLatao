@@ -15,7 +15,7 @@ export const Button: React.FC<iButtonProps> = ({ VarColor, children, paddingX, .
               boxShadow: 'var(--ShadowBtns)',
               transition: 'var(--transitionBtns);'
             }}
-            px={paddingX ? paddingX : '1rem'}
+            px={paddingX ? paddingX : '1.5rem'}
             color={'#fff'}
             bg={VarColor && `var(--${VarColor})`
         }>{children}</ChakraButton>

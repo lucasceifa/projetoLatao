@@ -6,9 +6,10 @@ import { Container, Div } from './styles'
 interface iBodyProps{
   isLoading?: boolean
 	children: any
+  background?: string
 }
 
-export const Body: React.FC<iBodyProps> = ({ isLoading, children }) => {
+export const Body: React.FC<iBodyProps> = ({ isLoading, children, background }) => {
   return (
     <Container>
 			{(isLoading) && (
@@ -24,7 +25,7 @@ export const Body: React.FC<iBodyProps> = ({ isLoading, children }) => {
         </Flex>
 			)}
 			{(!isLoading) && (
-				<Div style={{ maxWidth: '100vw', height: '100vh', boxSizing: 'border-box' }}>{children}</Div>
+				<Div style={{ maxWidth: '100vw', height: '100vh', boxSizing: 'border-box', background: background !== undefined ? `url(${background})` :  '', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: '25% 75%' }}>{children}</Div>
 			)}
 		</Container>
   )
