@@ -41,7 +41,7 @@ export const Header: React.FC = () => {
 				)}
 				<Box cursor={'pointer'} alignItems={'center'} overflowY={'hidden'} _hover={{ textDecor: 'underline' }} padding={'.75rem'} background={'transparent'} display={'flex'} h={'2.8rem'} gap={'1rem'}>
 					<BsFillGearFill size={24}/>
-					<Text color={'var(--white)'} overflowY={'hidden'} onClick={() => nav('/Characters')}>Configurações</Text>
+					<Text color={'var(--white)'} overflowY={'hidden'} onClick={() => nav('/Config')}>Configurações</Text>
 				</Box>
 			</nav>
 		</Flex>
