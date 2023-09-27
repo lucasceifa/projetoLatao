@@ -3,10 +3,11 @@
 import { useState } from "react"
 import { Body } from "../../components/Body/Index"
 import { Header } from "../../components/Header/Index"
-import { Box, Flex, FormControl, FormLabel, Img, Input, Text, useToast } from "@chakra-ui/react"
+import { Box, Divider, Flex, FormControl, FormLabel, Img, Input, Text, useToast } from "@chakra-ui/react"
 import { Button } from "../../components/Button"
 import { FaSave } from "react-icons/fa"
 import { iCard } from "../../interfaces"
+import { dataValidade } from "../../Utils/Helper"
 
 export const Config: React.FC = () => {
 
@@ -14,7 +15,7 @@ export const Config: React.FC = () => {
     
     const [ActiveTab, setActiveTab] = useState(0)
     const [Avatar, setAvatar] = useState('https://static.vecteezy.com/ti/fotos-gratis/p1/6671766-fantastica-lua-magica-luz-e-agua-barco-com-arvore-papel-de-parede-gratis-foto.jpg')
-    const [Cards, setCards] = useState<iCard[]>([])
+    const [Cards, setCards] = useState<iCard[]>([{ cardNumber: 1000000000004352, id: '1', propertyName: 'LUCAS DA SILVA', securityNumber: 232, validity: new Date()  }])
     
     const UpdateFile = (event: any ): void => {
         const formdata = new FormData()
@@ -105,12 +106,40 @@ export const Config: React.FC = () => {
                 )}
                 {ActiveTab === 1 && (
                     <Flex gap={'1.5rem'} flexDir={'column'} w={'56rem'} borderRadius={'0 1rem 1rem 1rem'} border={'1px solid var(--primary)'} px={'2rem'} pt={'1rem'} pb={'2rem'}>
-                        <Text fontWeight={'700'} fontSize={'22px'}>Métodos de pagamento</Text>
+                        <Text fontWeight={'700'} fontSize={'22px'} textAlign={'center'}>Métodos de pagamento</Text>
                         {Cards.map(e => {
                             return (
-                                <Flex></Flex>
+                                <Flex my={'1rem'} mx={'auto'} gap={'1rem'} fontWeight={'700'} color={'var(--text)'} minWidth={'30rem'} p={'2rem'} bgColor={'var(--primary)'} flexDir={'column'} w={'10rem'} fontSize={'22px'} borderRadius={'.5rem'}>
+                                    <Flex justifyContent={'space-between'}>
+                                        <Text>LataoCard</Text>
+                                        <Img w={'4rem'} src="../../public/nubank.png"/>
+                                    </Flex>
+                                    <Text>**** **** **** {e.cardNumber.toString().substring(12)}</Text>
+                                    <Text>{dataValidade(e.validity)}</Text>
+                                    <Text>{e.propertyName.toUpperCase()}</Text>
+                                </Flex>
                             )
                         })}
+                        <Divider my={'.5rem'}/>
+                        <Flex flexDir={'column'} w={'30rem'} mx={'auto'} gap={'1rem'}>
+                            <FormControl>
+                                <FormLabel>Nome no cartão</FormLabel>
+                                <Input placeholder="Nome no cartão"/>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel>Número do cartão</FormLabel>
+                                <Input placeholder="Número do cartão"/>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel>Código de segurança</FormLabel>
+                                <Input placeholder="Código de segurança"/>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel>Validade</FormLabel>
+                                <Input type="month"/>
+                            </FormControl>
+                            <Button mt={'1rem'} VarColor="sucess">Adicionar um cartão</Button>
+                        </Flex>
                     </Flex>
                 )}
             </Flex>

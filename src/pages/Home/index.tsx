@@ -14,9 +14,11 @@ import { Button } from "../../components/Button";
 import { iFlight } from "../../interfaces";
 import { formatarData } from "../../Utils/Helper";
 import { BsFillBagFill } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 export const Home: React.FC = () => {
 
+    const nav = useNavigate()
 
     const CustomPrevArrow = (props: { onClick: MouseEventHandler<HTMLDivElement> | undefined; }) => {
         return (
@@ -161,7 +163,7 @@ export const Home: React.FC = () => {
                       <Text fontWeight={'700'} color={'var(--sucess)'} fontSize={'20px'}>
                         {e.price}
                       </Text>
-                      <Button VarColor="primary" leftIcon={<BsFillBagFill />}>Comprar passagem</Button>
+                      <Button VarColor="primary" leftIcon={<BsFillBagFill />} onClick={() => nav(`/Compra/${e.id}`)}>Comprar passagem</Button>
                     </Flex>
                   </Flex>
                 </Flex>
