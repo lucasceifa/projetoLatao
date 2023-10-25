@@ -50,16 +50,52 @@ export const Home: React.FC = () => {
       const imgs = ['https://www.jetsetter.com//uploads/sites/7/2018/04/Yq6ObbTP-1380x690.jpeg', 'https://media.cntraveler.com/photos/607ef41f211142d4f98867a3/3:2/w_2560%2Cc_limit/Will%2520Cheaper%2520Pandemic%2520Airfares%2520Last%2520through%2520the%2520Summer_GettyImages-1140598797.jpg', 'https://media.cntraveler.com/photos/5fd26c4ddf72876c320b8001/16:9/w_2560%2Cc_limit/952456172']
 
       const [Flights, setFlights] = useState<iFlight[]>([{ airportTag: '', baggageWeight: '', company: '', finalDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' }, flightNumber: 0, goingDate: '', _id: '0', price: '', returnDate: '', startDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' } }])
+      const [FilterFlights, setFilterFlights] = useState<iFlight[]>([])
+
+      const [ReturnDate, setReturnDate] = useState('')
+      const [GoingDate, setGoingDate] = useState('')
+      const [OriginCity, setOriginCity] = useState('')
+      const [DestinationCity, setDestinationCity] = useState('')
+
+      const [DestinationOff, setDestinationOff] = useState(false)
+      const [DateOff, setDateOff] = useState(false)
+
+
+      function OnFilterFlights(): void {
+        var copy: iFlight[] = Flights 
+        if (OriginCity !== '') {
+          copy = copy.filter(e => { return e.startDestination.cityName.toLowerCase().includes(OriginCity.toLowerCase())})
+        }
+        if (DestinationCity !== '') {
+          copy = copy.filter(e => { return e.finalDestination.cityName.toLowerCase().includes(DestinationCity.toLowerCase())})
+        }
+        if (GoingDate !== '') {
+          copy = copy.filter(e => { return e.goingDate.substring(0, 10) === GoingDate })
+        }
+        if (ReturnDate !== '') {
+          copy = copy.filter(e => { return e.returnDate.substring(0, 10) === ReturnDate })
+        }
+        setFilterFlights(copy)
+      }
 
       function GetFlights() {
         appApi.get('flight')
-          .then(res => setFlights(res.data))
+          .then(res => { setFlights(res.data); setFilterFlights(res.data) })
           .catch(err => console.log(err))
       }
 
       useEffect(() => {
         GetFlights()
       }, [])
+
+      useEffect(() => {
+        setDestinationCity('')
+      }, [DestinationOff])
+
+      useEffect(() => {
+        setGoingDate('')
+        setReturnDate('')
+      }, [DateOff])
 
     return (
     <Body>
@@ -85,7 +121,7 @@ export const Home: React.FC = () => {
                           <InputLeftElement pointerEvents='none'>
                             <FaLocationDot color='var(--black)' />
                           </InputLeftElement>
-                          <Input type='text' placeholder='Cidade de origem' />
+                          <Input value={OriginCity} onChange={(e) => setOriginCity(e.target.value)} type='text' placeholder='Cidade de origem' />
                         </InputGroup>
                     </Flex>
                     <Flex flexDir={'column'} gap={'.5rem'}>
@@ -96,38 +132,38 @@ export const Home: React.FC = () => {
                           <InputLeftElement pointerEvents='none'>
                             <FaLocationDot color='var(--black)' />
                           </InputLeftElement>
-                          <Input type='text' placeholder='Cidade de destino' />
+                          <Input isDisabled={DestinationOff} value={DestinationCity} onChange={(e) => setDestinationCity(e.target.value)} type='text' placeholder='Cidade de destino' />
                         </InputGroup>
                     </Flex>
                     <Flex flexDir={'column'} gap={'.5rem'}>
                         <FormLabel>
                           Data de ida
                         </FormLabel>
-                        <Input type='date' w={'16rem'}/>
+                        <Input isDisabled={DateOff} value={GoingDate} onChange={(e) => setGoingDate(e.target.value)} type='date' w={'16rem'}/>
                     </Flex>
                     <Flex flexDir={'column'} gap={'.5rem'}>
                         <FormLabel>
                           Data de volta
                         </FormLabel>
-                        <Input type='date' w={'16rem'}/>
+                        <Input isDisabled={DateOff} value={ReturnDate} onChange={(e) => setReturnDate(e.target.value)} type='date' w={'16rem'}/>
                     </Flex>
                   </Flex>
-                  <Button fontSize={'18px'} leftIcon={<FaSearch size={14}/>} VarColor="primary">Buscar</Button>
+                  <Button fontSize={'18px'} onClick={OnFilterFlights} leftIcon={<FaSearch size={14}/>} VarColor="primary">Buscar</Button>
                 </Flex>
                 <Flex fontWeight={'700'} gap={'2rem'} px={'4rem'} mt={'1.5rem'}>
                   <Flex gap={'1rem'} alignItems={'center'}>
-                    <Switch/>
+                    <Switch onChange={(e) => { e.target.checked ? setDestinationOff(true) : setDestinationOff(false) }}/>
                     Ainda não defini o destino final
                   </Flex>
                   <Flex gap={'1rem'} alignItems={'center'}>
-                    <Switch/>
+                    <Switch onChange={(e) => { e.target.checked ? setDateOff(true) : setDateOff(false) }}/>
                     Ainda não defini as datas
                   </Flex>
                 </Flex>
             </Box>
         </Box>
         <Flex flexDir={'column'} gap={'3rem'} w={'1600px'} mx={'auto'} my={'2rem'}>
-            {Flights.map(e => {
+            {FilterFlights.map(e => {
               return (
                 <Flex overflowY={'hidden'} pos={'relative'} flexDir={'column'} borderRadius={'1rem'} border={'1px solid var(--primary)'} p={'3rem'}>
                   <Flex justifyContent={'space-between'} gap={'2rem'}>

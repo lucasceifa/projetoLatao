@@ -6,7 +6,7 @@ import { Header } from "../../components/Header/Index"
 import { Box, Divider, Flex, FormControl, FormLabel, Img, Input, Text, useToast } from "@chakra-ui/react"
 import { Button } from "../../components/Button"
 import { FaSave } from "react-icons/fa"
-import { iCard } from "../../interfaces"
+import { iCard, iUser } from "../../interfaces"
 import { dataValidade } from "../../Utils/Helper"
 
 export const Config: React.FC = () => {
@@ -14,22 +14,9 @@ export const Config: React.FC = () => {
     const toast = useToast()
     
     const [ActiveTab, setActiveTab] = useState(0)
-    const [Avatar, setAvatar] = useState('https://static.vecteezy.com/ti/fotos-gratis/p1/6671766-fantastica-lua-magica-luz-e-agua-barco-com-arvore-papel-de-parede-gratis-foto.jpg')
-    const [Cards, setCards] = useState<iCard[]>([{ cardNumber: 1000000000004352, id: '1', propertyName: 'LUCAS DA SILVA', securityNumber: 232, validity: new Date()  }])
+    const [UserUpdate, setUserUpdate] = useState<iUser>({})
+    const [Cards, setCards] = useState<iCard[]>([{ cardNumber: '', _id: '', propertyName: '', securityNumber: 232, validity: ''  }])
     
-    const UpdateFile = (event: any ): void => {
-        const formdata = new FormData()
-        formdata.append('file', event.target.files[0])
-        // appApi.post('User/UploadFile', formdata).then(resposnse => {
-        // if (str === 'banner') {
-        //     setModel({ ...Model, banner: resposnse.data })
-        // }
-        // if (str === 'avatar') {
-        //     setModel({ ...Model, avatar: resposnse.data })
-        // }
-        // }).catch(e => console.log(e))
-    }
-
     function UpdateUser(): void {
         toast({
           title: 'Informações atualizadas com sucesso!',
@@ -52,36 +39,10 @@ export const Config: React.FC = () => {
                     <Flex gap={'1.5rem'} flexDir={'column'} w={'56rem'} borderRadius={'0 1rem 1rem 1rem'} border={'1px solid var(--primary)'} px={'2rem'} pt={'1rem'} pb={'2rem'}>
                         <Text fontWeight={'700'} fontSize={'22px'}>Configurações do usuário</Text>
                         <Flex justifyContent={'center'} pos={'relative'}>
-                        {Avatar === '' &&
-                            <Flex alignItems={'center'} width='100%' justifyContent={'center'}>
-                                <label htmlFor='inputAvatar' style={{ cursor: 'pointer', textDecoration: 'underline', borderRadius: '50%', paddingLeft: '.75rem', paddingRight: '.75rem', paddingTop: '4.5rem', backgroundColor: 'var(--light50)', height: '12rem', width: '12rem', fontSize: '16px', textAlign: 'center', verticalAlign: 'bottom', color: 'var(--red-dark)' }}>Clique aqui para adicionar um avatar</label>
-                                <Input
-                                display={'none'}
-                                id='inputAvatar'
-                                accept="image/*"
-                                type={'file'}
-                                onChange={(e) => { UpdateFile(e) }}
-                                />
-                            </Flex>
-                        }
-                        {Avatar && Avatar.length > 3 &&
-                            <Flex flexDir={'column'}>
-                                <Img src={Avatar} objectFit={'cover'} w={'12rem'} h={'12rem'} borderRadius={'50%'}/>
-                                {/* <label htmlFor='inputAvatar' style={{ position: 'absolute', display: 'flex', alignItems: 'center', justifyContent: 'center', bottom: '0', left: '50%', transform: 'translate(-50%, 0)', cursor: 'pointer', textDecoration: 'underline', backgroundColor: 'var(--red-dark)', height: '1.5rem', width: '3rem', borderRadius: '0 0 35% 35%', fontSize: '14px', color: 'var(--white)', fontWeight: '700' }}><FaPencilAlt /></label> */}
-                                <label htmlFor='inputAvatar' style={{ cursor: 'pointer', fontWeight: '700', position: 'absolute', opacity: '1', textDecoration: 'underline', borderRadius: '50%', paddingLeft: '.75rem', paddingRight: '.75rem', paddingTop: '4.5rem', backgroundColor: 'var(--light50)', height: '12rem', width: '12rem', fontSize: '16px', textAlign: 'center', verticalAlign: 'bottom', color: 'var(--red-dark)' }}>Clique aqui para atualizar o avatar</label>
-                                <Input
-                                    display={'none'}
-                                    id='inputAvatar'
-                                    accept="image/*"
-                                    type={'file'}
-                                    onChange={(e) => { UpdateFile(e) }}
-                                />
-                            </Flex>
-                        }
                         </Flex>
                         <FormControl>
                             <FormLabel>Nome:</FormLabel>
-                            <Input placeholder="Digite o nome"/>
+                            <Input value={UserUpdate.name} onChange={(e) => setUserUpdate({...UserUpdate, name: e.target.value})} placeholder="Digite o nome"/>
                         </FormControl>
                         <FormControl>
                             <FormLabel>Senha atual:</FormLabel>
@@ -89,7 +50,7 @@ export const Config: React.FC = () => {
                         </FormControl>
                         <FormControl>
                             <FormLabel>Nova senha:</FormLabel>
-                            <Input placeholder="Digite sua nova senha"/>
+                            <Input value={UserUpdate.} onChange={(e) => setUserUpdate({...UserUpdate, password: e.target.value })} placeholder="Digite sua nova senha"/>
                         </FormControl>
                         <FormControl>
                             <FormLabel>Idade:</FormLabel>
@@ -98,6 +59,16 @@ export const Config: React.FC = () => {
                         <FormControl>
                             <FormLabel>Número de passaporte:</FormLabel>
                             <Input placeholder="Digite seu passaporte"/>
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel>Endereço:</FormLabel>
+                            <Flex justifyContent={'space-between'}>
+                                <Input w={'65%'} placeholder="Digite seu endereço"/>
+                                <Flex alignItems={'center'}  justifyContent={'flex-end'} gap={'1rem'}>
+                                    Nº:
+                                    <Input w={'11rem'} placeholder="Digite seu Número"/>
+                                </Flex>
+                            </Flex>
                         </FormControl>
                         <Flex justifyContent={'end'} mt={'2rem'}>
                             <Button VarColor="sucess" leftIcon={<FaSave/>} onClick={UpdateUser}>Salvar Alterações</Button>

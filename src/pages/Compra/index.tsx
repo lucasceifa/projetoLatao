@@ -27,6 +27,7 @@ export const Compra: React.FC = () => {
 
     const [ActiveStep, setActiveStep] = useState(-1)
     const [SelectedPlaces, setSelectedPlaces] = useState<string[]>([])
+    const [BoughtPlaces, setBoughtPlaces] = useState<string[]>([])
     const [AddCard, setAddCard] = useState(false)
     const [PaymentMethod, setPaymentMethod] = useState('0')
     const [NewCard, setNewCard] = useState<iCard>({ cardNumber: '', propertyName: '', securityNumber: 0o00, validity: '' })
@@ -55,7 +56,7 @@ export const Compra: React.FC = () => {
 
     function GetFlight(): void {
       appApi.get(`flight/${id}`)
-        .then(res => { setModel(res.data); setActiveStep(0); setSelectedPlaces(res.data.place); console.log(res.data.place) })
+        .then(res => { setModel(res.data); setActiveStep(0); setBoughtPlaces(res.data.place); console.log(res.data.place) })
         .catch(err => console.log(err))
     }
 
@@ -193,18 +194,18 @@ export const Compra: React.FC = () => {
                                 <Flex
                                   mb={i !== 1 ? '.65rem' : '1.75rem'}
                                   mr={'1rem'}
-                                  key={`${e}${i}`}
+                                  key={`${e}${i+1}`}
                                   w={'2rem'}
                                   h={'2rem'}
                                   fontSize={'14px'}
                                   fontWeight={'700'}
                                   alignItems={'center'}
-                                  bgColor={SelectedPlaces.includes(`${e}${i}`) ? 'var(--primary)' : 'var(--label)'}
+                                  bgColor={(SelectedPlaces.includes(`${e}${i+1}`) || BoughtPlaces.includes(`${e}${i+1}`)) ? 'var(--primary)' : 'var(--label)' }
                                   color={'var(--text)'}
                                   justifyContent={'center'}
                                   cursor={'pointer'}
-                                  _hover={{ bgColor: SelectedPlaces.includes(`${e}${i}`) ? 'var(--primary)' : 'var(--black35)' }}
-                                  onClick={() => { SelectedPlaces.includes(`${e}${i}`) ? setSelectedPlaces(SelectedPlaces.filter(a => a !== `${e}${i}`)) : setSelectedPlaces([...SelectedPlaces, `${e}${i}`]) }}
+                                  _hover={{ bgColor: !BoughtPlaces.includes(`${e}${i+1}`) ? SelectedPlaces.includes(`${e}${i+1}`) ? 'var(--primary)' : 'var(--black35)' : 'var(--primary)' }}
+                                  onClick={() => { if (!BoughtPlaces.includes(`${e}${i+1}`)) { SelectedPlaces.includes(`${e}${i+1}`) ? setSelectedPlaces(SelectedPlaces.filter(a => a !== `${e}${i+1}`)) : setSelectedPlaces([...SelectedPlaces, `${e}${i+1}`]) } }}
                                 >
                                   {`${e}${i + 1}`}
                                 </Flex>

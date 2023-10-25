@@ -7,7 +7,7 @@ export function formatarData(data: string): string {
 	const mes = String(new Date(data).getMonth() + 1).padStart(2, '0'); 
 	const ano = new Date(data).getFullYear();
   
-	return `${dia}/${mes}/${ano}`;
+	return `${parseInt(dia) + 1}/${mes}/${ano}`;
   }
 
 export function dataValidade(data: string): string {
