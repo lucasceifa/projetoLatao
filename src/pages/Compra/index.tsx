@@ -2,19 +2,21 @@
 import { Box, Flex, FormControl, FormLabel, Img, Input, Radio, RadioGroup, Select, Spinner, Stack, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, Text, useToast } from "@chakra-ui/react"
 import { Body } from "../../components/Body/Index"
 import { Header } from "../../components/Header/Index"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "../../components/Button"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { iCard, iFlight } from "../../interfaces"
 import { dataInput, dataValidade, formatarData } from "../../Utils/Helper"
 import { IoAirplane } from "react-icons/io5"
 import * as React from "react"
 import { FaPlus } from "react-icons/fa"
+import { appApi } from "../../services/appApi"
 
 export const Compra: React.FC = () => {
 
     const nav = useNavigate()
     const toast = useToast()
+    const { id } = useParams<{ id: string }>()
     
     const fileiras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
     const steps = [
@@ -23,14 +25,14 @@ export const Compra: React.FC = () => {
         { title: 'Pagamento', description: 'Escolha o método de pagamento' },
       ]
 
-    const [ActiveStep, setActiveStep] = useState(0)
+    const [ActiveStep, setActiveStep] = useState(-1)
     const [SelectedPlaces, setSelectedPlaces] = useState<string[]>([])
     const [AddCard, setAddCard] = useState(false)
     const [PaymentMethod, setPaymentMethod] = useState('0')
-    const [NewCard, setNewCard] = useState<iCard>({ cardNumber: 0o000000000000000, id: '9', propertyName: '', securityNumber: 0o00, validity: new Date() })
+    const [NewCard, setNewCard] = useState<iCard>({ cardNumber: '', propertyName: '', securityNumber: 0o00, validity: '' })
 
-    const [Model, setModel] = useState<iFlight>({ airportTag: 'GUA', baggageWeight: '18kg', company: 'GOL', finalDestiny: { cityName: 'São Paulo', cityTag: 'SP', country: 'Brasil', id: '1', zipcode: '9823456-322' }, flightNumber: 92, goingDate: new Date(), id: '0', price: 'R$ 2400', returnDate: new Date(), startDestiny: { cityName: 'Rio de Janeiro', cityTag: 'RJ', country: 'Brasil', id: '2', zipcode: '324567-088' } })
-    const [Cards, setCards] = useState<iCard[]>([{ cardNumber: 1000000000004352, id: '1', propertyName: 'LUCAS DA SILVA', securityNumber: 232, validity: new Date()  }, { cardNumber: 1000000000004352, id: '1', propertyName: 'LUCAS DA SILVA', securityNumber: 232, validity: new Date()  }, { cardNumber: 1000000000004352, id: '1', propertyName: 'LUCAS DA SILVA', securityNumber: 232, validity: new Date()  }])
+    const [Model, setModel] = useState<iFlight>({ airportTag: '', baggageWeight: '', company: '', finalDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' }, flightNumber: 0, goingDate: '', _id: '', price: '', returnDate: '', startDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' } })
+    const [Cards, setCards] = useState<iCard[]>()
 
     function formatInput(value: string) {
       const numericValue = value.replace(/\D/g, '');
@@ -50,6 +52,56 @@ export const Compra: React.FC = () => {
       })
       setAddCard(!AddCard)
     }
+
+    function GetFlight(): void {
+      appApi.get(`flight/${id}`)
+        .then(res => { setModel(res.data); setActiveStep(0); setSelectedPlaces(res.data.place); console.log(res.data.place) })
+        .catch(err => console.log(err))
+    }
+
+    function GetCards(): void {
+      appApi.get('user')
+        .then(res => { 
+          appApi.get(`card/${res.data._id}`)
+            .then(res => { setCards(res.data) })
+            .catch(err => { console.log(err) }) })
+        .catch(err => { console.log(err) })
+    }
+
+    function AddCardToUser(): void {
+      appApi.get('user')
+        .then(res => { 
+          appApi.post(`card/${res.data._id}`, NewCard)
+            .then(() => { Cards !== undefined ? setCards([...Cards, NewCard]) : setCards([NewCard]); RegisterCard() })
+            .catch(err => { console.log(err) }) })
+        .catch(err => { console.log(err) })
+    }
+
+    function ComprarPassagem(): void {
+      appApi.get('user')
+        .then(() => {
+          appApi.post(`user/flight/${id}`)
+            .then(res => {
+              toast(
+                { 
+                  title: 'Compra realizada com sucesso! Você será redirecionado em breve',
+                  status: 'success', 
+                  isClosable: false, 
+                  position: 'top', 
+                  duration: 4000 
+                }); 
+                setTimeout(() => { nav('/') }, 4000)
+                console.log(res.data)
+            })
+            .catch(err => console.log(err))
+          })
+        .catch(err => console.log(err))
+    }
+
+    useEffect(() => {
+      GetFlight()
+      GetCards()
+    }, [])
 
     return (
         <Body>
@@ -73,6 +125,19 @@ export const Compra: React.FC = () => {
               ))}
             </Stepper>
             <Flex w={'1600px'} mx={'auto'} borderRadius={'1rem'} border={'2px solid var(--secondary)'} px={'2rem'} py={'2rem'} flexDir={'column'}>
+                  {ActiveStep === -1 && (
+                    <Flex justifyContent={'center'} py={'4rem'} w={'100%'} overflowY={'hidden'}>
+                      <Spinner
+                        thickness='8px'
+                        speed='0.65s'
+                        emptyColor='green.500'
+                        color='var(--light)'
+                        height={'18rem'}
+                        width='18rem'
+                      />
+                    </Flex>
+                  )
+                  }
                   {ActiveStep === 0 && (
                     <>
                       <Text textAlign={'center'} fontWeight={'700'} fontSize={'20px'}>Tem certeza que deseja comprar uma ou mais passagens deste voo?</Text>
@@ -83,16 +148,16 @@ export const Compra: React.FC = () => {
                               <Text>Companhia: {Model.company}</Text>
                               <Text>Aeroporto: {Model.airportTag}</Text>
                               <Text>Número do voo: {Model.flightNumber}</Text>
-                              <Text>Embarque: {Model.startDestiny.cityName} - {Model.startDestiny.cityTag}, {Model.startDestiny.zipcode} </Text>
-                              <Text>País: {Model.startDestiny.country}</Text>
+                              <Text>Embarque: {Model.startDestination.cityName} - {Model.startDestination.cityTag}, {Model.startDestination.zipcode} </Text>
+                              <Text>País: {Model.startDestination.country}</Text>
                             </Flex>
                             <Flex flexDir={'column'} w={'10rem'} alignItems={'center'} justifyContent={'center'} fontWeight={'700'}>
                               <Text>IDA: {formatarData(Model.goingDate)}</Text>
                               <IoAirplane size={80}/>
                             </Flex>
                             <Flex flexDir={'column'}>
-                              <Text>Desembarque: {Model.finalDestiny.cityName} - {Model.finalDestiny.cityTag}, {Model.finalDestiny.zipcode}</Text>
-                              <Text>País: {Model.finalDestiny.country}</Text>
+                              <Text>Desembarque: {Model.finalDestination.cityName} - {Model.finalDestination.cityTag}, {Model.finalDestination.zipcode}</Text>
+                              <Text>País: {Model.finalDestination.country}</Text>
                             </Flex>
                           </Flex>
                           <Box w={'2px'} h={'13.5rem'} pos={'absolute'} top={'20px'} left={'50%'} transform={'translate(-50%, 0)'} bgColor={'var(--black35)'}></Box>
@@ -101,16 +166,16 @@ export const Compra: React.FC = () => {
                               <Text>Companhia: {Model.company}</Text>
                               <Text>Aeroporto: {Model.airportTag}</Text>
                               <Text>Número do voo: {Model.flightNumber}</Text>
-                              <Text>Embarque: {Model.finalDestiny.cityName} - {Model.finalDestiny.cityTag}, {Model.finalDestiny.zipcode}</Text>
-                              <Text>País: {Model.finalDestiny.country}</Text>
+                              <Text>Embarque: {Model.finalDestination.cityName} - {Model.finalDestination.cityTag}, {Model.finalDestination.zipcode}</Text>
+                              <Text>País: {Model.finalDestination.country}</Text>
                             </Flex>
                             <Flex flexDir={'column'} w={'11rem'} alignItems={'center'} justifyContent={'center'} fontWeight={'700'}>
                               <Text>VOLTA: {formatarData(Model.returnDate)}</Text>
                               <IoAirplane size={80}/>
                             </Flex>
                             <Flex flexDir={'column'}>
-                              <Text>Desembarque: {Model.startDestiny.cityName} - {Model.startDestiny.cityTag}, {Model.startDestiny.zipcode}</Text>
-                              <Text>País: {Model.startDestiny.country}</Text>
+                              <Text>Desembarque: {Model.startDestination.cityName} - {Model.startDestination.cityTag}, {Model.startDestination.zipcode}</Text>
+                              <Text>País: {Model.startDestination.country}</Text>
                             </Flex>
                           </Flex>
                         </Flex>
@@ -167,7 +232,7 @@ export const Compra: React.FC = () => {
                       <Flex flexDir={'column'}  mt={'2rem'}>
                         <RadioGroup onChange={setPaymentMethod} value={PaymentMethod}>
                           <Stack mb={'2rem'} gap={'3rem'} direction='row' flexWrap={'wrap'} alignItems={'flex-start'} justifyContent={'start'} mx={'auto'} w={'1080px'}>
-                          {Cards.map((e, i) => {
+                          {Cards && Cards.map((e, i) => {
                             return (
                                 <Radio value={i.toString()} borderColor={'var(--primary)'}>
                                     <Flex gap={'1rem'} fontWeight={'700'} color={'var(--text)'} minWidth={'30rem'} p={'2rem'} bgColor={'var(--primary)'} flexDir={'column'} w={'10rem'} fontSize={'22px'} borderRadius={'.5rem'}>
@@ -193,7 +258,7 @@ export const Compra: React.FC = () => {
                               </FormControl>
                               <FormControl>
                                   <FormLabel>Número do cartão</FormLabel>
-                                  <Input value={NewCard.cardNumber} type="number" onChange={(e) => { if (parseInt(e.target.value) <= 9999999999999999n || isNaN(parseInt(e.target.value))) setNewCard({ ...NewCard, cardNumber: parseInt(e.target.value) })}} placeholder="Número do cartão"/>
+                                  <Input value={NewCard.cardNumber} type="number" onChange={(e) => { if (parseInt(e.target.value) <= 9999999999999999n || isNaN(parseInt(e.target.value))) setNewCard({ ...NewCard, cardNumber: e.target.value })}} placeholder="Número do cartão"/>
                               </FormControl>
                               <FormControl>
                                   <FormLabel>Código de segurança</FormLabel>
@@ -201,9 +266,9 @@ export const Compra: React.FC = () => {
                               </FormControl>
                               <FormControl>
                                   <FormLabel>Validade</FormLabel>
-                                  <Input onChange={(e) => { if (e.target.valueAsDate !== null) setNewCard({ ...NewCard, validity: new Date(dataInput(e.target.valueAsDate)) }) }} type="month"/>
+                                  <Input onChange={(e) => { if (e.target.valueAsDate !== null) setNewCard({ ...NewCard, validity: dataInput(e.target.value) }) }} type="month"/>
                               </FormControl>
-                              <Button mt={'1rem'} VarColor="sucess" onClick={RegisterCard}>Adicionar um cartão</Button>
+                              <Button mt={'1rem'} VarColor="sucess" onClick={AddCardToUser}>Adicionar um cartão</Button>
                             </Flex>
                             <Flex mt={'2rem'} gap={'1rem'} fontWeight={'700'} color={'var(--text)'} minWidth={'30rem'} h={'17rem'} p={'2rem'} bgColor={'var(--secondary)'} flexDir={'column'} w={'10rem'} fontSize={'22px'} borderRadius={'.5rem'}>
                               <Flex justifyContent={'space-between'}>
@@ -240,7 +305,7 @@ export const Compra: React.FC = () => {
                   {ActiveStep !== 3 && (
                     <Flex w={'100%'} gap={'1rem'} justifyContent={'end'} mt={'1rem'}>
                       <Button VarColor="secondary" onClick={() => { if (ActiveStep !== 1) { setActiveStep(ActiveStep - 1) } else { nav('/') } }}>Cancelar</Button>
-                      <Button VarColor="sucess" onClick={() => { setActiveStep(ActiveStep + 1); if (ActiveStep === 2) { toast({ title: 'Compra realizada com sucesso! Você será redirecionado em breve', status: 'success', isClosable: false, position: 'top', duration: 4000 }); setTimeout(() => { nav('/') }, 4000) } }}>{ActiveStep !== 2 ? 'Próximo' : 'Finalizar'}</Button>
+                      <Button VarColor="sucess" onClick={() => { setActiveStep(ActiveStep + 1); if (ActiveStep === 2) { ComprarPassagem() } }}>{ActiveStep !== 2 ? 'Próximo' : 'Finalizar'}</Button>
                     </Flex>
                   )}
             </Flex>

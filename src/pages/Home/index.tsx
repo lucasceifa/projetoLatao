@@ -8,13 +8,14 @@ import 'slick-carousel/slick/slick-theme.css';
 import { FaArrowLeft, FaArrowRight, FaSearch } from 'react-icons/fa';
 import { FaLocationDot } from 'react-icons/fa6';
 import { IoAirplane } from 'react-icons/io5';
-import { MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import './styles.css'
 import { Button } from "../../components/Button";
 import { iFlight } from "../../interfaces";
 import { formatarData } from "../../Utils/Helper";
 import { BsFillBagFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { appApi } from "../../services/appApi";
 
 export const Home: React.FC = () => {
 
@@ -48,7 +49,17 @@ export const Home: React.FC = () => {
 
       const imgs = ['https://www.jetsetter.com//uploads/sites/7/2018/04/Yq6ObbTP-1380x690.jpeg', 'https://media.cntraveler.com/photos/607ef41f211142d4f98867a3/3:2/w_2560%2Cc_limit/Will%2520Cheaper%2520Pandemic%2520Airfares%2520Last%2520through%2520the%2520Summer_GettyImages-1140598797.jpg', 'https://media.cntraveler.com/photos/5fd26c4ddf72876c320b8001/16:9/w_2560%2Cc_limit/952456172']
 
-      const [Flights, setFlights] = useState<iFlight[]>([{ airportTag: 'GUA', baggageWeight: '18kg', company: 'GOL', finalDestiny: { cityName: 'São Paulo', cityTag: 'SP', country: 'Brasil', id: '1', zipcode: '9823456-322' }, flightNumber: 92, goingDate: new Date(), id: '0', price: 'R$ 2400', returnDate: new Date(), startDestiny: { cityName: 'Rio de Janeiro', cityTag: 'RJ', country: 'Brasil', id: '2', zipcode: '324567-088' } }])
+      const [Flights, setFlights] = useState<iFlight[]>([{ airportTag: '', baggageWeight: '', company: '', finalDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' }, flightNumber: 0, goingDate: '', _id: '0', price: '', returnDate: '', startDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' } }])
+
+      function GetFlights() {
+        appApi.get('flight')
+          .then(res => setFlights(res.data))
+          .catch(err => console.log(err))
+      }
+
+      useEffect(() => {
+        GetFlights()
+      }, [])
 
     return (
     <Body>
@@ -125,16 +136,16 @@ export const Home: React.FC = () => {
                         <Text>Companhia: {e.company}</Text>
                         <Text>Aeroporto: {e.airportTag}</Text>
                         <Text>Número do voo: {e.flightNumber}</Text>
-                        <Text>Embarque: {e.startDestiny.cityName} - {e.startDestiny.cityTag}, {e.startDestiny.zipcode} </Text>
-                        <Text>País: {e.startDestiny.country}</Text>
+                        <Text>Embarque: {e.startDestination.cityName} - {e.startDestination.cityTag}, {e.startDestination.zipcode} </Text>
+                        <Text>País: {e.startDestination.country}</Text>
                       </Flex>
                       <Flex flexDir={'column'} w={'10rem'} alignItems={'center'} justifyContent={'center'} fontWeight={'700'}>
                         <Text>IDA: {formatarData(e.goingDate)}</Text>
                         <IoAirplane size={80}/>
                       </Flex>
                       <Flex flexDir={'column'}>
-                        <Text>Desembarque: {e.finalDestiny.cityName} - {e.finalDestiny.cityTag}, {e.finalDestiny.zipcode}</Text>
-                        <Text>País: {e.finalDestiny.country}</Text>
+                        <Text>Desembarque: {e.finalDestination.cityName} - {e.finalDestination.cityTag}, {e.finalDestination.zipcode}</Text>
+                        <Text>País: {e.finalDestination.country}</Text>
                       </Flex>
                     </Flex>
                     <Box w={'2px'} h={'13.5rem'} pos={'absolute'} top={'20px'} left={'50%'} transform={'translate(-50%, 0)'} bgColor={'var(--black35)'}></Box>
@@ -143,16 +154,16 @@ export const Home: React.FC = () => {
                         <Text>Companhia: {e.company}</Text>
                         <Text>Aeroporto: {e.airportTag}</Text>
                         <Text>Número do voo: {e.flightNumber}</Text>
-                        <Text>Embarque: {e.finalDestiny.cityName} - {e.finalDestiny.cityTag}, {e.finalDestiny.zipcode}</Text>
-                        <Text>País: {e.finalDestiny.country}</Text>
+                        <Text>Embarque: {e.finalDestination.cityName} - {e.finalDestination.cityTag}, {e.finalDestination.zipcode}</Text>
+                        <Text>País: {e.finalDestination.country}</Text>
                       </Flex>
                       <Flex flexDir={'column'} w={'11rem'} alignItems={'center'} justifyContent={'center'} fontWeight={'700'}>
                         <Text>VOLTA: {formatarData(e.returnDate)}</Text>
                         <IoAirplane size={80}/>
                       </Flex>
                       <Flex flexDir={'column'}>
-                        <Text>Desembarque: {e.startDestiny.cityName} - {e.startDestiny.cityTag}, {e.startDestiny.zipcode}</Text>
-                        <Text>País: {e.startDestiny.country}</Text>
+                        <Text>Desembarque: {e.startDestination.cityName} - {e.startDestination.cityTag}, {e.startDestination.zipcode}</Text>
+                        <Text>País: {e.startDestination.country}</Text>
                       </Flex>
                     </Flex>
                   </Flex>
@@ -163,7 +174,7 @@ export const Home: React.FC = () => {
                       <Text fontWeight={'700'} color={'var(--sucess)'} fontSize={'20px'}>
                         {e.price}
                       </Text>
-                      <Button VarColor="primary" leftIcon={<BsFillBagFill />} onClick={() => nav(`/Compra/${e.id}`)}>Comprar passagem</Button>
+                      <Button VarColor="primary" leftIcon={<BsFillBagFill />} onClick={() => nav(`/Compra/${e._id}`)}>Comprar passagem</Button>
                     </Flex>
                   </Flex>
                 </Flex>

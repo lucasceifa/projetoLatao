@@ -1,19 +1,19 @@
 export interface iFlight {
-	id: string
+	_id: string
 	price: string
-	place?: string
+	place?: string[]
 	flightNumber: number
 	airportTag: string
 	company: string
 	baggageWeight: string
-	goingDate: Date
-	returnDate: Date
-	startDestiny: iDestiny
-	finalDestiny: iDestiny
+	goingDate: string
+	returnDate: string
+	startDestination: iDestination
+	finalDestination: iDestination
 }
 
-export interface iDestiny {
-	id: string
+export interface iDestination {
+	_id: string
 	cityName: string
 	zipcode: string
 	cityTag: string
@@ -21,7 +21,7 @@ export interface iDestiny {
 }
 
 export interface iUser {
-	id: string
+	_id: string
 	name: string
 	password: string
 	cpf: string
@@ -32,9 +32,9 @@ export interface iUser {
 }
 
 export interface iCard {
-	id: string
-	cardNumber: number
+	_id?: string
+	cardNumber: string
 	securityNumber: number
-	validity: Date
+	validity: string
 	propertyName: string
 }

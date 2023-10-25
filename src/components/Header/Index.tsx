@@ -11,13 +11,13 @@ export const Header: React.FC = () => {
 	const [UserName, setUserName] = useState<string>('')
 
 	function GetLoginInfos(): void {
-		appApi.get('User')
-			.then(res => { setUserName(res.data.username); })
-			.catch(err => { appApi.defaults.headers.common.Authorization = `bearer ${localStorage.getItem('token')}`;console.log(err) })
+		appApi.get('user')
+			.then(res => { setUserName(res.data.name); })
+			.catch(err => { console.log(err) })
 	}
 
 	useEffect(() => {
-		appApi.defaults.headers.common.Authorization = `bearer ${localStorage.getItem('token')}`
+		appApi.defaults.headers.common.Authorization = `${localStorage.getItem('token')}`
 		GetLoginInfos()
 	}, [])
 
@@ -35,7 +35,7 @@ export const Header: React.FC = () => {
 				)}
 				{!pathname.includes('Login') && UserName !== '' && (
 					<Flex flexDir={'column'} fontWeight={'700'} alignItems={'flex-end'}>
-						<Flex gap={'.3rem'}>Bem Vindo {UserName} <Text color={'var(--red)'}>{UserName}</Text></Flex>
+						<Flex gap={'.3rem'}>Bem Vindo <Text color={'var(--blue-light)'}>{UserName}</Text></Flex>
 						<Box fontSize={'12px'} onClick={() => { appApi.defaults.headers.common.Authorization = ''; localStorage.setItem('token', ''); window.location.reload() }} _hover={{ textDecoration: 'underline', cursor: 'pointer' }}>Logout</Box>
 					</Flex>
 				)}
