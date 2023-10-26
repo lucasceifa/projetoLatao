@@ -5,7 +5,7 @@ import { Header } from "../../components/Header/Index"
 import { useState, useEffect } from "react"
 import { Button } from "../../components/Button"
 import { useNavigate, useParams } from "react-router-dom"
-import { iCard, iFlight } from "../../interfaces"
+import { iCard, iFlight, iPlaces } from "../../interfaces"
 import { dataInput, dataValidade, formatarData } from "../../Utils/Helper"
 import { IoAirplane } from "react-icons/io5"
 import * as React from "react"
@@ -27,12 +27,12 @@ export const Compra: React.FC = () => {
 
     const [ActiveStep, setActiveStep] = useState(-1)
     const [SelectedPlaces, setSelectedPlaces] = useState<string[]>([])
-    const [BoughtPlaces, setBoughtPlaces] = useState<string[]>([])
+    const [BoughtPlaces, setBoughtPlaces] = useState<iPlaces[]>([{ user_id: '', user_places: [] }])
     const [AddCard, setAddCard] = useState(false)
     const [PaymentMethod, setPaymentMethod] = useState('0')
     const [NewCard, setNewCard] = useState<iCard>({ cardNumber: '', propertyName: '', securityNumber: 0o00, validity: '' })
 
-    const [Model, setModel] = useState<iFlight>({ airportTag: '', baggageWeight: '', company: '', finalDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' }, flightNumber: 0, goingDate: '', _id: '', price: '', returnDate: '', startDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' } })
+    const [Model, setModel] = useState<iFlight>({ airportTag: '', baggageWeight: '', company: '', finalDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' }, flightNumber: 0, goingDate: '', _id: '', price: '', returnDate: '', startDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' }, place: [] })
     const [Cards, setCards] = useState<iCard[]>()
 
     function formatInput(value: string) {
@@ -80,9 +80,9 @@ export const Compra: React.FC = () => {
 
     function ComprarPassagem(): void {
       appApi.get('user')
-        .then(() => {
+        .then((res) => {
           appApi.post(`user/flight/${id}`)
-            .then(res => {
+            .then(() => {
               toast(
                 { 
                   title: 'Compra realizada com sucesso! Você será redirecionado em breve',
@@ -92,11 +92,23 @@ export const Compra: React.FC = () => {
                   duration: 4000 
                 }); 
                 setTimeout(() => { nav('/') }, 4000)
-                console.log(res.data)
             })
+            .catch(err => console.log(err))
+          console.log(res.data._id)
+          appApi.put(`flight/${Model._id}`, { airportTag: Model.airportTag, baggageWeight: Model.baggageWeight, company: Model.company, finalDestination: { cityName: Model.finalDestination.cityName, cityTag: Model.finalDestination.cityTag, country: Model.finalDestination.country, _id: Model.finalDestination._id, zipcode: Model.finalDestination.zipcode }, flightNumber: Model.flightNumber, goingDate: Model.goingDate,  price: Model.price, returnDate: Model.returnDate, startDestination: { cityName: Model.startDestination.cityName, cityTag: Model.startDestination.cityTag, country: Model.startDestination.country, _id: Model.startDestination._id, zipcode: Model.startDestination.zipcode }, place: [...Model.place, { user_id: res.data._id, user_places: SelectedPlaces }] })
+            .then(() => { })
             .catch(err => console.log(err))
           })
         .catch(err => console.log(err))
+    }
+
+    function ReturnPlaces(str: string): boolean {
+      const places: string[] = []
+      BoughtPlaces.forEach(e => e.user_places.forEach(a => places.push(a)))
+      if (places.includes(str) ) {
+        return true 
+      }
+      return false
     }
 
     useEffect(() => {
@@ -200,12 +212,12 @@ export const Compra: React.FC = () => {
                                   fontSize={'14px'}
                                   fontWeight={'700'}
                                   alignItems={'center'}
-                                  bgColor={(SelectedPlaces.includes(`${e}${i+1}`) || BoughtPlaces.includes(`${e}${i+1}`)) ? 'var(--primary)' : 'var(--label)' }
+                                  bgColor={(SelectedPlaces.includes(`${e}${i+1}`) || ReturnPlaces(`${e}${i+1}`)) ? 'var(--primary)' : 'var(--label)' }
                                   color={'var(--text)'}
                                   justifyContent={'center'}
                                   cursor={'pointer'}
-                                  _hover={{ bgColor: !BoughtPlaces.includes(`${e}${i+1}`) ? SelectedPlaces.includes(`${e}${i+1}`) ? 'var(--primary)' : 'var(--black35)' : 'var(--primary)' }}
-                                  onClick={() => { if (!BoughtPlaces.includes(`${e}${i+1}`)) { SelectedPlaces.includes(`${e}${i+1}`) ? setSelectedPlaces(SelectedPlaces.filter(a => a !== `${e}${i+1}`)) : setSelectedPlaces([...SelectedPlaces, `${e}${i+1}`]) } }}
+                                  _hover={{ bgColor: !ReturnPlaces(`${e}${i+1}`) ? SelectedPlaces.includes(`${e}${i+1}`) ? 'var(--primary)' : 'var(--black35)' : 'var(--primary)' }}
+                                  onClick={() => { if (!ReturnPlaces(`${e}${i+1}`)) { SelectedPlaces.includes(`${e}${i+1}`) ? setSelectedPlaces(SelectedPlaces.filter(a => a !== `${e}${i+1}`)) : setSelectedPlaces([...SelectedPlaces, `${e}${i+1}`]) } }}
                                 >
                                   {`${e}${i + 1}`}
                                 </Flex>

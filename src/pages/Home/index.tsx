@@ -49,7 +49,7 @@ export const Home: React.FC = () => {
 
       const imgs = ['https://www.jetsetter.com//uploads/sites/7/2018/04/Yq6ObbTP-1380x690.jpeg', 'https://media.cntraveler.com/photos/607ef41f211142d4f98867a3/3:2/w_2560%2Cc_limit/Will%2520Cheaper%2520Pandemic%2520Airfares%2520Last%2520through%2520the%2520Summer_GettyImages-1140598797.jpg', 'https://media.cntraveler.com/photos/5fd26c4ddf72876c320b8001/16:9/w_2560%2Cc_limit/952456172']
 
-      const [Flights, setFlights] = useState<iFlight[]>([{ airportTag: '', baggageWeight: '', company: '', finalDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' }, flightNumber: 0, goingDate: '', _id: '0', price: '', returnDate: '', startDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' } }])
+      const [Flights, setFlights] = useState<iFlight[]>([{ airportTag: '', baggageWeight: '', company: '', finalDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' }, flightNumber: 0, goingDate: '', _id: '0', price: '', returnDate: '', startDestination: { cityName: '', cityTag: '', country: '', _id: '', zipcode: '' }, place: [] }])
       const [FilterFlights, setFilterFlights] = useState<iFlight[]>([])
 
       const [ReturnDate, setReturnDate] = useState('')
@@ -62,7 +62,7 @@ export const Home: React.FC = () => {
 
 
       function OnFilterFlights(): void {
-        var copy: iFlight[] = Flights 
+        let copy: iFlight[] = Flights 
         if (OriginCity !== '') {
           copy = copy.filter(e => { return e.startDestination.cityName.toLowerCase().includes(OriginCity.toLowerCase())})
         }

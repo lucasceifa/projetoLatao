@@ -1,31 +1,80 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Body } from "../../components/Body/Index"
 import { Header } from "../../components/Header/Index"
 import { Box, Divider, Flex, FormControl, FormLabel, Img, Input, Text, useToast } from "@chakra-ui/react"
 import { Button } from "../../components/Button"
 import { FaSave } from "react-icons/fa"
-import { iCard, iUser } from "../../interfaces"
-import { dataValidade } from "../../Utils/Helper"
+import { iCard, iUserUpdate } from "../../interfaces"
+import { dataInput, dataValidade } from "../../Utils/Helper"
+import { appApi } from "../../services/appApi"
 
 export const Config: React.FC = () => {
 
     const toast = useToast()
     
     const [ActiveTab, setActiveTab] = useState(0)
-    const [UserUpdate, setUserUpdate] = useState<iUser>({})
+    const [UserUpdate, setUserUpdate] = useState<iUserUpdate>({ address: '', age: 0, cpf: '', name: '', number: '', password: '', passportNumber: '' })
     const [Cards, setCards] = useState<iCard[]>([{ cardNumber: '', _id: '', propertyName: '', securityNumber: 232, validity: ''  }])
-    
+    const [OldPassword, setOldPassword] = useState('')
+    const [NewCard, setNewCard] = useState<iCard>({ cardNumber: '', propertyName: '', securityNumber: 0o00, validity: '' })
+
     function UpdateUser(): void {
-        toast({
-          title: 'Informações atualizadas com sucesso!',
-          status: 'success',
-          isClosable: false,
-          position: 'top',
-          duration: 4000
-        })
+        const data: iUserUpdate = { address: UserUpdate.address, age: UserUpdate.age, cpf: UserUpdate.cpf, name: UserUpdate.name, number: UserUpdate.number, password: UserUpdate.password, passportNumber: UserUpdate.passportNumber }
+        appApi.post('user/verificate', { password: OldPassword })
+			.then((res) => { 
+                if (res.data === true) {
+                    appApi.put('user', data)
+                    .then(res => { 
+                        console.log(res.data); 
+                        toast({
+                        title: 'Informações atualizadas com sucesso!',
+                        status: 'success',
+                        isClosable: false,
+                        position: 'top',
+                        duration: 4000
+                      })})
+                    .catch(err => { console.log(err) })
+                }
+             })
+			.catch(err => { console.log(err) })
     }
+
+    function GetUser(): void {
+        appApi.get('user')
+			.then(res => { setUserUpdate(res.data); })
+			.catch(err => { console.log(err) })
+    }
+
+    function GetCards(): void {
+        appApi.get('user')
+          .then(res => { 
+            appApi.get(`card/${res.data._id}`)
+              .then(res => { setCards(res.data) })
+              .catch(err => { console.log(err) }) })
+          .catch(err => { console.log(err) })
+      }  
+
+    function AddCardToUser(): void {
+      appApi.get('user')
+        .then(res => { 
+          appApi.post(`card/${res.data._id}`, NewCard)
+            .then(() => { Cards !== undefined ? setCards([...Cards, NewCard]) : setCards([NewCard]); toast({
+                title: 'Cartão cadastrado com sucesso!',
+                status: 'success',
+                isClosable: false,
+                position: 'top',
+                duration: 4000
+              }) })
+            .catch(err => { console.log(err) }) })
+        .catch(err => { console.log(err) })
+    }
+
+    useEffect(() => {
+        GetUser()
+        GetCards()
+    }, [])
 
     return (
         <Body>
@@ -46,27 +95,23 @@ export const Config: React.FC = () => {
                         </FormControl>
                         <FormControl>
                             <FormLabel>Senha atual:</FormLabel>
-                            <Input placeholder="Digite sua senha atual"/>
+                            <Input value={OldPassword} onChange={(e) => setOldPassword(e.target.value) } placeholder="Digite sua senha atual"/>
                         </FormControl>
                         <FormControl>
                             <FormLabel>Nova senha:</FormLabel>
-                            <Input value={UserUpdate.} onChange={(e) => setUserUpdate({...UserUpdate, password: e.target.value })} placeholder="Digite sua nova senha"/>
-                        </FormControl>
-                        <FormControl>
-                            <FormLabel>Idade:</FormLabel>
-                            <Input type="number" placeholder="Digite sua idade"/>
+                            <Input value={UserUpdate.password} onChange={(e) => setUserUpdate({...UserUpdate, password: e.target.value })} placeholder="Digite sua nova senha"/>
                         </FormControl>
                         <FormControl>
                             <FormLabel>Número de passaporte:</FormLabel>
-                            <Input placeholder="Digite seu passaporte"/>
+                            <Input value={UserUpdate.passportNumber} onChange={(e) => setUserUpdate({...UserUpdate, passportNumber: e.target.value })} placeholder="Digite seu passaporte"/>
                         </FormControl>
                         <FormControl>
                             <FormLabel>Endereço:</FormLabel>
                             <Flex justifyContent={'space-between'}>
-                                <Input w={'65%'} placeholder="Digite seu endereço"/>
+                                <Input value={UserUpdate.address} onChange={(e) => setUserUpdate({...UserUpdate, address: e.target.value })} w={'65%'} placeholder="Digite seu endereço"/>
                                 <Flex alignItems={'center'}  justifyContent={'flex-end'} gap={'1rem'}>
                                     Nº:
-                                    <Input w={'11rem'} placeholder="Digite seu Número"/>
+                                    <Input value={UserUpdate.number} onChange={(e) => setUserUpdate({...UserUpdate, number: e.target.value })} w={'11rem'} placeholder="Digite seu Número"/>
                                 </Flex>
                             </Flex>
                         </FormControl>
@@ -95,21 +140,21 @@ export const Config: React.FC = () => {
                         <Flex flexDir={'column'} w={'30rem'} mx={'auto'} gap={'1rem'}>
                             <FormControl>
                                 <FormLabel>Nome no cartão</FormLabel>
-                                <Input placeholder="Nome no cartão"/>
+                                <Input value={NewCard.propertyName} onChange={(e) => setNewCard({...NewCard, propertyName: e.target.value })} placeholder="Nome no cartão"/>
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Número do cartão</FormLabel>
-                                <Input placeholder="Número do cartão"/>
+                                <Input value={NewCard.cardNumber} type="number" onChange={(e) => { if (parseInt(e.target.value) <= 9999999999999999n || isNaN(parseInt(e.target.value))) setNewCard({ ...NewCard, cardNumber: e.target.value })}} placeholder="Número do cartão"/>
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Código de segurança</FormLabel>
-                                <Input placeholder="Código de segurança"/>
+                                <Input value={NewCard.securityNumber} onChange={(e) => setNewCard({...NewCard, securityNumber: parseInt(e.target.value) })} placeholder="Código de segurança"/>
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Validade</FormLabel>
-                                <Input type="month"/>
+                                <Input value={NewCard.validity} onChange={(e) => setNewCard({...NewCard, validity: e.target.value })} type="month"/>
                             </FormControl>
-                            <Button mt={'1rem'} VarColor="sucess">Adicionar um cartão</Button>
+                            <Button mt={'1rem'} VarColor="sucess" onClick={AddCardToUser}>Adicionar um cartão</Button>
                         </Flex>
                     </Flex>
                 )}

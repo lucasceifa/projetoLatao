@@ -1,6 +1,6 @@
 import { Box, Flex, Img, Text } from "@chakra-ui/react"
 import { useState, useEffect } from "react"
-import { BsFillGearFill, BsFillPersonFill } from "react-icons/bs"
+import { BsAirplane, BsFillGearFill, BsFillPersonFill } from "react-icons/bs"
 import { useLocation, useNavigate } from "react-router-dom"
 import { appApi } from "../../services/appApi"
 
@@ -13,7 +13,7 @@ export const Header: React.FC = () => {
 	function GetLoginInfos(): void {
 		appApi.get('user')
 			.then(res => { setUserName(res.data.name); })
-			.catch(err => { console.log(err) })
+			.catch(err => { appApi.defaults.headers.common.Authorization = ''; localStorage.setItem('token', ''); console.log(err) })
 	}
 
 	useEffect(() => {
@@ -27,6 +27,14 @@ export const Header: React.FC = () => {
 				<Img h={'5.5rem'} src={'../../public/logo.png'} cursor={'pointer'} onClick={() => nav('/')}/>
 			</Flex>
 			<nav style={{ display: 'flex', minWidth: '51rem', justifyContent: 'flex-end', alignItems: 'center', gap: '2rem'}}>
+				<Box cursor={'pointer'} alignItems={'center'} overflowY={'hidden'} _hover={{ textDecor: 'underline' }} padding={'.75rem'} background={'transparent'} display={'flex'} h={'2.8rem'} gap={'1rem'}>
+					<BsAirplane size={24}/>
+					<Text color={'var(--white)'} overflowY={'hidden'} onClick={() => nav('/MyFlights')}>Meus voos</Text>
+				</Box>
+				<Box cursor={'pointer'} alignItems={'center'} overflowY={'hidden'} _hover={{ textDecor: 'underline' }} padding={'.75rem'} background={'transparent'} display={'flex'} h={'2.8rem'} gap={'1rem'}>
+					<BsFillGearFill size={24}/>
+					<Text color={'var(--white)'} overflowY={'hidden'} onClick={() => nav('/Config')}>Configurações</Text>
+				</Box>
 				{!pathname.includes('Login') && UserName === '' && (
 					<Box _hover={{ textDecor: 'underline' }}  display={'flex'} alignItems={'center'} gap={'1rem'} cursor={'pointer'} onClick={() => nav('/Login')}>
 						<BsFillPersonFill size={24}/>
@@ -39,10 +47,6 @@ export const Header: React.FC = () => {
 						<Box fontSize={'12px'} onClick={() => { appApi.defaults.headers.common.Authorization = ''; localStorage.setItem('token', ''); window.location.reload() }} _hover={{ textDecoration: 'underline', cursor: 'pointer' }}>Logout</Box>
 					</Flex>
 				)}
-				<Box cursor={'pointer'} alignItems={'center'} overflowY={'hidden'} _hover={{ textDecor: 'underline' }} padding={'.75rem'} background={'transparent'} display={'flex'} h={'2.8rem'} gap={'1rem'}>
-					<BsFillGearFill size={24}/>
-					<Text color={'var(--white)'} overflowY={'hidden'} onClick={() => nav('/Config')}>Configurações</Text>
-				</Box>
 			</nav>
 		</Flex>
 	)

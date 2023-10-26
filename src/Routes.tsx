@@ -4,6 +4,7 @@ import { Login } from './pages/Login'
 import { Config } from './pages/Config'
 import { Compra } from './pages/Compra'
 import { IsAuth } from './Utils/Helper'
+import { MyFlights } from './pages/MyFlights'
 
 export const AppRoutes: React.FC = () => {
 
@@ -21,6 +22,7 @@ export const AppRoutes: React.FC = () => {
         <Route path='Login' element={<Login />}/>
         <Route element={<AuthenticateRoutes />}>
           <Route path='' element={<Home />}/>
+          <Route path='MyFlights' element={<MyFlights />}/>
           <Route path='Config' element={<Config />}/>
           <Route path='Compra/:id' element={<Compra />}/>
         </Route>

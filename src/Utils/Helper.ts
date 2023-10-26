@@ -11,8 +11,12 @@ export function formatarData(data: string): string {
   }
 
 export function dataValidade(data: string): string {
-	const mes = String(new Date(data).getMonth() + 1).padStart(2, '0'); 
-	const ano = new Date(data).getFullYear();
+	let mes = String(new Date(data).getMonth() + 2).padStart(2, '0'); 
+	let ano = new Date(data).getFullYear();
+	if (mes === '13') {
+		mes = '1'
+		ano++ 
+	}
   
 	return `${mes}/${ano}`;
   }

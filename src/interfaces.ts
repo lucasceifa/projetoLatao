@@ -1,7 +1,7 @@
 export interface iFlight {
 	_id: string
 	price: string
-	place?: string[]
+	place: iPlaces[]
 	flightNumber: number
 	airportTag: string
 	company: string
@@ -10,6 +10,11 @@ export interface iFlight {
 	returnDate: string
 	startDestination: iDestination
 	finalDestination: iDestination
+}
+
+export interface iPlaces {
+	user_id: string
+	user_places: string[]
 }
 
 export interface iDestination {
@@ -27,6 +32,15 @@ export interface iUser {
 	cpf: string
 	age: number
 	adress: string
+	number: string
+	passportNumber?: string
+}
+export interface iUserUpdate {
+	name: string
+	password: string
+	cpf: string
+	age: number
+	address: string
 	number: string
 	passportNumber?: string
 }
